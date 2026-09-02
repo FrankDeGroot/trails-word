@@ -1,0 +1,89 @@
+name: Deploy to Azure
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP || 'rg-wordtrails' }}
+  LOCATION: ${{ vars.AZURE_LOCATION || 'eastus2' }}
+  APP_NAME: ${{ vars.AZURE_APP_NAME || 'wordtrails' }}
+
+jobs:
+  provision-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Create Resource Group
+        run: |
+          az group create --name "$RESOURCE_GROUP" --location "$LOCATION"
+
+      - name: Deploy Infrastructure (Bicep)
+        id: arm_deploy
+        run: |
+          DEPLOY_OUTPUT=$(az deployment group create \
+            --resource-group "$RESOURCE_GROUP" \
+            --template-file infra/main.bicep \
+            --parameters appName="$APP_NAME" location="$LOCATION" \
+            --query properties.outputs)
+          
+          STORAGE_ACCOUNT=$(echo "$DEPLOY_OUTPUT" | jq -r .storageAccountName.value)
+          CONTAINER_NAME=$(echo "$DEPLOY_OUTPUT" | jq -r .blobContainerName.value)
+          SWA_NAME=$(echo "$DEPLOY_OUTPUT" | jq -r .staticWebAppName.value)
+          SWA_TOKEN=$(echo "$DEPLOY_OUTPUT" | jq -r .staticWebAppDeploymentApiKey.value)
+          
+          echo "STORAGE_ACCOUNT=$STORAGE_ACCOUNT" >> $GITHUB_ENV
+          echo "CONTAINER_NAME=$CONTAINER_NAME" >> $GITHUB_ENV
+          echo "SWA_NAME=$SWA_NAME" >> $GITHUB_ENV
+          echo "SWA_DEPLOYMENT_TOKEN=$SWA_TOKEN" >> $GITHUB_ENV
+
+      - name: Seed Word List to Azure Blob Storage
+        if: ${{ env.STORAGE_ACCOUNT != '' }}
+        run: |
+          echo "Checking if word_trails.txt exists in blob container..."
+          EXISTS=$(az storage blob exists \
+            --account-name "$STORAGE_ACCOUNT" \
+            --container-name "$CONTAINER_NAME" \
+            --name word_trails.txt \
+            --auth-mode key \
+            --query exists -o tsv)
+
+          if [ "$EXISTS" != "true" ]; then
+            echo "Uploading initial word_trails.txt to Azure Blob Storage..."
+            az storage blob upload \
+              --account-name "$STORAGE_ACCOUNT" \
+              --container-name "$CONTAINER_NAME" \
+              --name word_trails.txt \
+              --file word_trails.txt \
+              --auth-mode key \
+              --content-type "text/plain; charset=utf-8"
+            echo "Seed upload complete."
+          else
+            echo "word_trails.txt already exists in Azure Blob Storage. Skipping seed."
+          fi
+
+      - name: Build & Deploy to Azure Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN || env.SWA_DEPLOYMENT_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "/"
+          api_location: "api"
+          output_location: ""
+          skip_app_build: true

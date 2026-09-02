@@ -1,0 +1,43 @@
+{
+  "name": "Word Finder (Azure Serverless)",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "features": {
+    "ghcr.io/devcontainers/features/azure-cli:1": {
+      "installBicep": true
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-bicep",
+        "ms-azuretools.vscode-azurefunctions",
+        "ms-azuretools.vscode-azurestaticwebapps",
+        "ms-azuretools.vscode-azurestorage"
+      ],
+      "settings": {
+        "azureFunctions.projectLanguage": "JavaScript",
+        "azureFunctions.projectRuntime": "~4"
+      }
+    }
+  },
+  "forwardPorts": [
+    4280,
+    7071,
+    10000
+  ],
+  "portsAttributes": {
+    "4280": {
+      "label": "Static Web Apps Emulator",
+      "onAutoForward": "openBrowser"
+    },
+    "7071": {
+      "label": "Azure Functions API",
+      "onAutoForward": "silent"
+    },
+    "10000": {
+      "label": "Azurite Blob Service",
+      "onAutoForward": "silent"
+    }
+  },
+  "postCreateCommand": "npm install -g azure-functions-core-tools@4 @azure/static-web-apps-cli azurite && if [ -d api ]; then cd api && npm install; fi"
+}

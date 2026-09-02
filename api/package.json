@@ -1,0 +1,14 @@
+{
+  "name": "trails-word-api",
+  "version": "1.0.0",
+  "description": "Azure Functions backend for Word Finder word list management",
+  "main": "src/functions/*.js",
+  "scripts": {
+    "start": "func start",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.5.1",
+    "@azure/storage-blob": "^12.24.0"
+  }
+}
