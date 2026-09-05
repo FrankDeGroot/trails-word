@@ -23,7 +23,7 @@ A fast, serverless word finder web application designed for word games. Built wi
 
 ```
 ├── .devcontainer/
-│   └── devcontainer.json            # VS Code Dev Container config (Node 20, Azure CLI, Tools)
+│   └── devcontainer.json            # VS Code Dev Container config (Node 24, Azure CLI, Tools)
 ├── .github/
 │   └── workflows/
 │       └── azure-deploy.yml         # GitHub Actions CI/CD deployment workflow
@@ -101,7 +101,7 @@ The workflow will automatically:
 ## Local Development
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (v18+)
+- [Node.js](https://nodejs.org/) (v24+)
 - [Azure Functions Core Tools](https://github.com/Azure/azure-functions-core-tools) (`npm i -g azure-functions-core-tools@4`)
 - [Azure Static Web Apps CLI](https://azure.github.io/static-web-apps-cli/) (`npm i -g @azure/static-web-apps-cli`)
 - [Azurite](https://github.com/Azure/Azurite) for local blob storage (or a real Azure Storage connection string)

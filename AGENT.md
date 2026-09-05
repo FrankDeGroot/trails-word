@@ -50,7 +50,7 @@ flowchart LR
 
 - [index.html](index.html) — Main static web application frontend.
 - `word_trails.txt` — Source sorted list of ~370,000 English words (used for initial seed).
-- [.devcontainer/devcontainer.json](.devcontainer/devcontainer.json) — Dev container specification with Node 20, Azure CLI + Bicep, Functions Core Tools, SWA CLI, and Azurite.
+- [.devcontainer/devcontainer.json](.devcontainer/devcontainer.json) — Dev container specification with Node 24, Azure CLI + Bicep, Functions Core Tools, SWA CLI, and Azurite.
 - [staticwebapp.config.json](staticwebapp.config.json) — Azure Static Web Apps routing and configuration.
 - [infra/identity.bicep](infra/identity.bicep) — Azure Bicep template provisioning GitHub Actions user-assigned managed identity, OIDC federated credential, and Contributor role assignment.
 - [infra/identity.bicepparam](infra/identity.bicepparam) — Parameter values for identity Bicep deployment.
