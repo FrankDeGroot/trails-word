@@ -12,7 +12,7 @@ permissions:
 
 env:
   RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP || 'rg-wordtrails' }}
-  LOCATION: ${{ vars.AZURE_LOCATION || 'eastus2' }}
+  LOCATION: ${{ vars.AZURE_LOCATION || 'swedencentral' }}
   APP_NAME: ${{ vars.AZURE_APP_NAME || 'wordtrails' }}
 
 jobs:
