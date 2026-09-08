@@ -58,9 +58,12 @@ Because GitHub Actions needs *something* to authenticate with before it can run 
 ```bash
 SUBSCRIPTION_ID="<SUBSCRIPTION_ID>"
 RESOURCE_GROUP="rg-wordtrails"
-LOCATION="swedencentral"
+LOCATION="westeurope"
 GITHUB_ORG="<your-github-org-or-user>"
+GITHUB_ORG_ID="<your-github-org-id>"
 GITHUB_REPO="trails-word"
+GITHUB_REPO_ID="<your-github-repo-id>"
+GITHUB_BRANCH="main"
 
 az account set --subscription "$SUBSCRIPTION_ID"
 az group create --name "$RESOURCE_GROUP" --location "$LOCATION"
@@ -69,15 +72,20 @@ az deployment group create \
   --resource-group "$RESOURCE_GROUP" \
   --template-file infra/identity.bicep \
   --parameters appName="wordtrails" location="$LOCATION" \
-    githubOrg="$GITHUB_ORG" githubRepo="$GITHUB_REPO" githubBranch="main"
+    githubOrg="$GITHUB_ORG" githubOrgId="$GITHUB_ORG_ID" \
+    githubRepo="$GITHUB_REPO" githubRepoId="$GITHUB_REPO_ID" \
+    githubBranch="$GITHUB_BRANCH"
 ```
 
 This creates the `wordtrails-github-deploy` managed identity with a federated credential trusting `repo:$GITHUB_ORG/$GITHUB_REPO:ref:refs/heads/main`, granted `Contributor` on the resource group.
 
-Retrieve the identity's client ID and add the following repository secrets under **Settings > Secrets and variables > Actions**:
+Retrieve the identity's client ID from the Bicep deployment output and add the following repository secrets under **Settings > Secrets and variables > Actions**:
 
 ```bash
-az identity show --name wordtrails-github-deploy --resource-group "$RESOURCE_GROUP" --query clientId -o tsv
+az deployment group show \
+  --name "$(az deployment group list --resource-group "$RESOURCE_GROUP" --query "[0].name" -o tsv)" \
+  --resource-group "$RESOURCE_GROUP" \
+  --query "properties.outputs.githubIdentityClientId.value" -o tsv
 az account show --query tenantId -o tsv
 ```
 
@@ -91,7 +99,7 @@ Subsequent pushes to `main` deploy the workload via [infra/main.bicep](infra/mai
 Push changes to the `main` branch or trigger the workflow manually from GitHub Actions (**Actions > Deploy to Azure > Run workflow**).
 
 The workflow will automatically:
-1. Create the resource group (default: `rg-wordtrails` in `swedencentral`).
+1. Create the resource group (default: `rg-wordtrails` in `westeurope`).
 2. Deploy the workload Bicep template (Azure Storage Account + Azure Static Web App) from [infra/main.bicep](infra/main.bicep).
 3. Seed `word_trails.txt` to Azure Blob Storage if it has not been uploaded yet.
 4. Deploy the frontend and API to Azure Static Web Apps.

@@ -9,8 +9,14 @@ param appName string = 'wordtrails'
 @description('GitHub organization or user that owns the repository (for OIDC federation)')
 param githubOrg string
 
+@description('GitHub organization ID (for OIDC federation)')
+param githubOrgId string
+
 @description('GitHub repository name (for OIDC federation)')
 param githubRepo string
+
+@description('GitHub repository ID (for OIDC federation)')
+param githubRepoId string
 
 @description('Git branch allowed to federate as the deployment identity')
 param githubBranch string = 'main'
@@ -27,7 +33,7 @@ resource githubFederatedCredential 'Microsoft.ManagedIdentity/userAssignedIdenti
   name: 'github-actions-${githubBranch}'
   properties: {
     issuer: 'https://token.actions.githubusercontent.com'
-    subject: 'repo:${githubOrg}/${githubRepo}:ref:refs/heads/${githubBranch}'
+    subject: 'repo:${githubOrg}@${githubOrgId}/${githubRepo}@${githubRepoId}:ref:refs/heads/${githubBranch}'
     audiences: [
       'api://AzureADTokenExchange'
     ]
