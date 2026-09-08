@@ -61,3 +61,11 @@ flowchart LR
 - [api/src/functions/words.js](api/src/functions/words.js) — Azure Function endpoints (`GET /api/words`, `DELETE /api/words`).
 - [api/local.settings.json.example](api/local.settings.json.example) — Local environment variables and Azurite connection string.
 - [.github/workflows/azure-deploy.yml](.github/workflows/azure-deploy.yml) — Automated GitHub Actions CI/CD deployment workflow.
+
+## Required Validation After Changes
+
+- After changing any Bicep file in [infra](infra), run lint before finishing work:
+  - `az bicep lint --file infra/main.bicep`
+  - `az bicep lint --file infra/identity.bicep`
+- Fix any lint warnings or errors before considering the change complete.
+- Never output secrets from Bicep templates; if a deployment secret is required, retrieve it through Azure tooling at runtime instead of exposing it as a template output.

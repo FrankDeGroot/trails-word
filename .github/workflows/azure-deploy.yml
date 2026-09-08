@@ -48,12 +48,15 @@ jobs:
             --template-file infra/main.bicep \
             --parameters appName="$APP_NAME" location="$LOCATION" \
             --query properties.outputs)
-          
+
           STORAGE_ACCOUNT=$(echo "$DEPLOY_OUTPUT" | jq -r .storageAccountName.value)
           CONTAINER_NAME=$(echo "$DEPLOY_OUTPUT" | jq -r .blobContainerName.value)
           SWA_NAME=$(echo "$DEPLOY_OUTPUT" | jq -r .staticWebAppName.value)
-          SWA_TOKEN=$(echo "$DEPLOY_OUTPUT" | jq -r .staticWebAppDeploymentApiKey.value)
-          
+          SWA_TOKEN=$(az staticwebapp secrets list \
+            --name "$SWA_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --query "properties.apiKey" -o tsv)
+
           echo "STORAGE_ACCOUNT=$STORAGE_ACCOUNT" >> $GITHUB_ENV
           echo "CONTAINER_NAME=$CONTAINER_NAME" >> $GITHUB_ENV
           echo "SWA_NAME=$SWA_NAME" >> $GITHUB_ENV

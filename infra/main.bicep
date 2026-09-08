@@ -94,4 +94,3 @@ output blobContainerName string = blobContainerName
 output blobFileName string = blobFileName
 output staticWebAppName string = staticWebApp.name
 output staticWebAppDefaultHostname string = staticWebApp.properties.defaultHostname
-output staticWebAppDeploymentApiKey string = staticWebApp.listSecrets().properties.apiKey
