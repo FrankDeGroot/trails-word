@@ -39,8 +39,12 @@ A fast, serverless word finder web application designed for word games. Built wi
 │   ├── identity.bicepparam          # Identity Bicep parameters
 │   ├── main.bicep                   # Workload Bicep template (Storage + Static Web App)
 │   └── main.bicepparam              # Workload Bicep parameters
-├── index.html                       # Frontend application
-├── staticwebapp.config.json         # Static Web App configuration & routing
+├── public/
+│   ├── index.html                   # Frontend markup
+│   ├── styles.css                   # Frontend styles
+│   ├── script.js                    # Frontend logic
+│   ├── staticwebapp.config.json     # Static Web App configuration & routing
+│   └── word_trails.txt              # Symlink to ../word_trails.txt (local offline fallback)
 ├── word_trails.txt                  # Initial dataset of ~370,000 words
 └── AGENT.md                         # Project documentation
 ```
@@ -54,6 +58,18 @@ A fast, serverless word finder web application designed for word games. Built wi
 Authentication uses a **user-assigned managed identity** with a federated (OIDC) credential trusting GitHub Actions — no app registration, service principal, or client secret is required. The identity and its federated credential are defined in [infra/identity.bicep](infra/identity.bicep).
 
 Because GitHub Actions needs *something* to authenticate with before it can run the first deployment, bootstrap the identity once from your local machine (or Cloud Shell) using an account with `Owner`/`User Access Administrator` rights on the subscription:
+
+Use the [GitHub CLI](https://cli.github.com/) to look up the numeric org and repo IDs required below:
+
+```bash
+# GitHub org ID (or user ID, if the repo is under a personal account)
+gh api orgs/<your-github-org> --jq .id
+# or, for a personal account:
+gh api users/<your-github-username> --jq .id
+
+# GitHub repo ID
+gh api repos/<your-github-org>/trails-word --jq .id
+```
 
 ```bash
 SUBSCRIPTION_ID="<SUBSCRIPTION_ID>"
@@ -127,6 +143,6 @@ The workflow will automatically:
    ```
 3. Start the Static Web Apps emulator (serves both frontend and API):
    ```bash
-   swa start . --api-location api
+   swa start public --api-location api
    ```
 4. Open `http://localhost:4280` in your browser.

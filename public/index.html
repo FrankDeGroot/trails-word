@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word Finder</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+  <h1>Word Finder</h1>
+
+  <div class="controls">
+    <div class="field">
+      <label for="letters-input">Available letters</label>
+      <input id="letters-input" type="text" placeholder="e.g. wordtrails" autocomplete="off" spellcheck="false" autocapitalize="none">
+    </div>
+
+    <div class="field">
+      <label>Word length</label>
+      <div class="slider-row">
+        <input id="length-slider" type="range" min="3" max="30" value="3">
+        <span id="length-display">3</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Position filter <span style="font-weight:400;text-transform:none;letter-spacing:0">(leave blank to match any)</span></label>
+      <div id="position-filters"></div>
+    </div>
+
+    <div id="status">Loading word list…</div>
+  </div>
+
+  <div id="results">
+    <div id="results-count"></div>
+    <div id="words-container"></div>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

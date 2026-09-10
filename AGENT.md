@@ -31,7 +31,7 @@ flowchart LR
    - `GET /api/words`: Streams the word list from Blob Storage with caching headers (`Cache-Control: public, max-age=60, stale-while-revalidate=300`). Falls back to local `word_trails.txt` during offline/local development.
    - `DELETE /api/words`: Removes a specified word from the stored blob atomically with JSON or query param payload `{ "word": "target" }`.
 3. **Frontend UI Tier**:
-   - [index.html](index.html) hosted on Azure Static Web Apps (Free tier).
+   - [public/index.html](public/index.html), [public/styles.css](public/styles.css), and [public/script.js](public/script.js) hosted on Azure Static Web Apps (Free tier).
    - Filters words by:
      - `letters-input`: Available letter bag (respecting letter frequency).
      - `length-slider`: Target word length.
@@ -48,10 +48,12 @@ flowchart LR
 
 ## Project Structure
 
-- [index.html](index.html) — Main static web application frontend.
-- `word_trails.txt` — Source sorted list of ~370,000 English words (used for initial seed).
+- [public/index.html](public/index.html) — Main static web application markup.
+- [public/styles.css](public/styles.css) — Frontend styles (theming, layout, word tags).
+- [public/script.js](public/script.js) — Frontend logic (filtering, theme toggle, word deletion).
+- `word_trails.txt` — Source sorted list of ~370,000 English words (used for initial seed); symlinked as `public/word_trails.txt` for local offline fallback.
 - [.devcontainer/devcontainer.json](.devcontainer/devcontainer.json) — Dev container specification with Node 24, Azure CLI + Bicep, Functions Core Tools, SWA CLI, and Azurite.
-- [staticwebapp.config.json](staticwebapp.config.json) — Azure Static Web Apps routing and configuration.
+- [public/staticwebapp.config.json](public/staticwebapp.config.json) — Azure Static Web Apps routing and configuration.
 - [infra/identity.bicep](infra/identity.bicep) — Azure Bicep template provisioning GitHub Actions user-assigned managed identity, OIDC federated credential, and Contributor role assignment.
 - [infra/identity.bicepparam](infra/identity.bicepparam) — Parameter values for identity Bicep deployment.
 - [infra/main.bicep](infra/main.bicep) — Declarative Azure Bicep template provisioning Storage Account, blob container, and Static Web App.
